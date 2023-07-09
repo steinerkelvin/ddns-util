@@ -14,13 +14,13 @@ pub struct Cli {
 #[derive(Clone, Debug, ValueEnum)]
 pub enum DetectIpv4Option {
     Auto,
-    // Custom,
+    Nope,
 }
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum DetectIpv6Option {
     Auto,
-    // Custom,
+    Nope,
 }
 
 #[derive(Subcommand)]
