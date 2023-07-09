@@ -4,6 +4,7 @@ use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::FromStr;
 
 use clap::Parser;
+use thiserror::Error;
 
 const IPV4_DETECT_URL: &str = "https://api.ipify.org/";
 const IPV6_DETECT_URL: &str = "https://api6.ipify.org/";
@@ -29,36 +30,67 @@ async fn dynv6_update(
     ipv6: Option<Ipv6Addr>,
 ) -> anyhow::Result<()> {
     if let Some(ipv4) = ipv4 {
-        eprintln!("Updating Dynv6 hostname '{}' with IPv4: '{}'", hostname, ipv4);
+        eprintln!(
+            "Updating Dynv6 hostname '{}' with IPv4: '{}'",
+            hostname, ipv4
+        );
         let url = format!(
             "{}?hostname={}&token={}&ipv4={}",
             DYNV6_BASE_URL, hostname, token, ipv4,
         );
         let res = reqwest::get(url).await?;
         if !res.status().is_success() {
-            anyhow::bail!("Dynv6 update failed: {}. \"{}\"", res.status(), res.text().await?);
+            anyhow::bail!(
+                "Dynv6 update failed: {}. \"{}\"",
+                res.status(),
+                res.text().await?
+            );
         }
         eprintln!("Dynv6 update successful: {}", res.text().await?);
-    } 
+    }
     if let Some(ipv6) = ipv6 {
-        eprintln!("Updating Dynv6 hostname '{}' with IPv6: '{}'", hostname, ipv6);
+        eprintln!(
+            "Updating Dynv6 hostname '{}' with IPv6: '{}'",
+            hostname, ipv6
+        );
         let url = format!(
             "{}?hostname={}&token={}&ipv6={}",
             DYNV6_BASE_URL, hostname, token, ipv6,
         );
         let res = reqwest::get(url).await?;
         if !res.status().is_success() {
-            anyhow::bail!("Dynv6 update failed: {}. \"{}\"", res.status(), res.text().await?);
+            anyhow::bail!(
+                "Dynv6 update failed: {}. \"{}\"",
+                res.status(),
+                res.text().await?
+            );
         }
-    } 
+    }
     Ok(())
+}
+
+#[derive(Debug, Error)]
+#[error("Missing configuration (environment variable: {env:?})")]
+struct MissingConfigError {
+    env: Option<String>,
+}
+
+fn get_env_var(var_name: &str) -> anyhow::Result<String> {
+    let val = std::env::var(var_name);
+    match val {
+        Ok(val) => Ok(val),
+        Err(err) => Err(anyhow::Error::new(MissingConfigError {
+            env: Some(var_name.to_string()),
+        })
+        .context(err)),
+    }
 }
 
 async fn run(args: cli::Cli) -> anyhow::Result<()> {
     let token_var = "DYNV6_TOKEN";
-    let token = std::env::var(token_var).expect("Missing token environment variable");
+    let token = get_env_var(token_var)?;
     let hostname_var = "HOSTNAME";
-    let hostname = std::env::var(hostname_var).expect("Missing hostname environment variable");
+    let hostname = get_env_var(hostname_var)?;
 
     let ipv4 = match args.detect_ipv4 {
         cli::DetectIpv4Option::Auto => Some(detect_ipv4().await?),
