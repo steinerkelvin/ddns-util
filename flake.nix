@@ -27,14 +27,14 @@
         };
 
         # For `nix develop`:
-        devShell = pkgs.mkShell {
+        devShells.default = pkgs.mkShell {
           buildInputs = [
             pkgs.openssl
           ];
           nativeBuildInputs = [
             pkgs.pkg-config
-            pkgs.rustc
-            pkgs.cargo
+            # pkgs.rustc
+            # pkgs.cargo
           ];
         };
       }

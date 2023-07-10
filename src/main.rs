@@ -24,19 +24,19 @@ async fn detect_ipv6() -> anyhow::Result<Ipv6Addr> {
 }
 
 async fn dynv6_update(
-    hostname: &str,
+    domain: &str,
     token: &str,
     ipv4: Option<Ipv4Addr>,
     ipv6: Option<Ipv6Addr>,
 ) -> anyhow::Result<()> {
     if let Some(ipv4) = ipv4 {
         eprintln!(
-            "Updating Dynv6 hostname '{}' with IPv4: '{}'",
-            hostname, ipv4
+            "Updating Dynv6 domain '{}' with IPv4: '{}'",
+            domain, ipv4
         );
         let url = format!(
             "{}?hostname={}&token={}&ipv4={}",
-            DYNV6_BASE_URL, hostname, token, ipv4,
+            DYNV6_BASE_URL, domain, token, ipv4,
         );
         let res = reqwest::get(url).await?;
         if !res.status().is_success() {
@@ -50,12 +50,12 @@ async fn dynv6_update(
     }
     if let Some(ipv6) = ipv6 {
         eprintln!(
-            "Updating Dynv6 hostname '{}' with IPv6: '{}'",
-            hostname, ipv6
+            "Updating Dynv6 domain '{}' with IPv6: '{}'",
+            domain, ipv6
         );
         let url = format!(
             "{}?hostname={}&token={}&ipv6={}",
-            DYNV6_BASE_URL, hostname, token, ipv6,
+            DYNV6_BASE_URL, domain, token, ipv6,
         );
         let res = reqwest::get(url).await?;
         if !res.status().is_success() {
@@ -89,8 +89,8 @@ fn get_env_var(var_name: &str) -> anyhow::Result<String> {
 async fn run(args: cli::Cli) -> anyhow::Result<()> {
     let token_var = "DYNV6_TOKEN";
     let token = get_env_var(token_var)?;
-    let hostname_var = "HOSTNAME";
-    let hostname = get_env_var(hostname_var)?;
+    let domain_var = "DOMAIN";
+    let domain = get_env_var(domain_var)?;
 
     let ipv4 = match args.detect_ipv4 {
         cli::DetectIpv4Option::Auto => Some(detect_ipv4().await?),
@@ -101,7 +101,7 @@ async fn run(args: cli::Cli) -> anyhow::Result<()> {
         cli::DetectIpv6Option::Nope => None,
     };
 
-    dynv6_update(&hostname, &token, ipv4, ipv6).await?;
+    dynv6_update(&domain, &token, ipv4, ipv6).await?;
 
     Ok(())
 }
