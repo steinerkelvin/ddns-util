@@ -32,11 +32,13 @@
             pkgs.openssl
           ];
           nativeBuildInputs = [
+            pkgs.pkg-config
             pkgs.rustc
             pkgs.cargo
-            pkgs.pkg-config
           ];
         };
       }
-    );
+    ) // {
+      nixosModules.k-ddns = import ./nix/modules/k-ddns.nix;
+    };
 }
