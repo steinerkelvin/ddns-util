@@ -30,7 +30,7 @@ in
       description = "k-ddns service timer";
       timerConfig = {
         OnBootSec = "1min";
-        OnActiveSec = "5min";
+        OnUnitActiveSec = "5min";
       };
     };
 
