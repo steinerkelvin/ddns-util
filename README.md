@@ -31,3 +31,10 @@ k-ddns -4 auto -6 auto
 
 - [ ] Pass IP values manually.
 - [ ] More IP detection providers.
+
+# Systemd service
+
+We provide [a NixOS module](https://github.com/steinerkelvin/k-ddns/blob/master/nix/modules/k-ddns.nix)
+at `thisFlake.nixosModules.k-ddns` to run this tool periodically with systemd timers.
+
+Someone should probably add example systemd definition files too tho.
