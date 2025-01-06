@@ -1,5 +1,7 @@
 *~
 
-/.direnv
+/result
 
-/target
+/.direnv/
+
+/target/

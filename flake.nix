@@ -14,6 +14,11 @@
             inherit system;
           };
 
+          shellPkgs = [
+            pkgs.just
+            pkgs.act
+          ];
+
           naersk' = pkgs.callPackage naersk { };
         in
         {
@@ -30,14 +35,15 @@
 
           # For `nix develop`:
           devShells.default = pkgs.mkShell {
-            buildInputs = [
-              pkgs.openssl
-            ];
             nativeBuildInputs = [
               pkgs.pkg-config
               # pkgs.rustc
               # pkgs.cargo
             ];
+            buildInputs = [
+              pkgs.openssl
+            ];
+            packages = shellPkgs;
           };
         }
       ) // {
